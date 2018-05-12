@@ -130,6 +130,12 @@ AUTOSCALE_GROUP: {AUTOSCALE_GROUP}
 PROJECTS: {PROJECTS}
 VENUE: {VENUE}
 
+# Azure settings for autoscale workers
+AZURE_STORAGE_ACCOUNT_NAME: {AZURE_STORAGE_ACCOUNT_NAME}
+AZURE_STORAGE_ACCOUNT_KEY: {AZURE_STORAGE_ACCOUNT_KEY}
+AZURE_ENDPOINT: {AZURE_ENDPOINT}
+CODE_CONTAINER: {CODE_CONTAINER}
+
 # git oauth token
 GIT_OAUTH_TOKEN: {GIT_OAUTH_TOKEN}
 
@@ -268,6 +274,13 @@ CFG_DEFAULTS = {
         [ "AUTOSCALE_GROUP", ""],
         [ "PROJECTS", "dumby dumby_urgent"],
         [ "VENUE", "ops"],
+    ],
+
+    "azure": [
+        [ "AZURE_STORAGE_ACCOUNT_NAME", ""],
+        [ "AZURE_STORAGE_ACCOUNT_KEY", ""],
+        [ "AZURE_ENDPOINT", ""],
+        [ "CODE_CONTAINER", ""],
     ]
 }
 
@@ -593,6 +606,36 @@ def configure():
                        default=unicode(cfg.get(k, d)),
                        style=prompt_style)
         cfg[k] = v
+
+
+    # azure
+    for k, d in CFG_DEFAULTS['azure']:
+        if k in ('AZURE_STORAGE_ACCOUNT_KEY'):
+            while True:
+                p1 = prompt(get_prompt_tokens=lambda x: [(Token, "Enter value for "),
+                                                        (Token.Param, "%s" % k), 
+                                                        (Token, ": ")],
+                           default=unicode(cfg.get(k, d)),
+                           style=prompt_style,
+                           is_password=True)
+                p2 = prompt(get_prompt_tokens=lambda x: [(Token, "Re-enter value for "),
+                                                        (Token.Param, "%s" % k), 
+                                                        (Token, ": ")],
+                           default=unicode(cfg.get(k, d)),
+                           style=prompt_style,
+                           is_password=True)
+                if p1 == p2:
+                    v = p1
+                    break
+                print("Values don't match.")
+        else:
+            v = prompt(get_prompt_tokens=lambda x: [(Token, "Enter value for "),
+                                                    (Token.Param, "%s" % k), 
+                                                    (Token, ": ")],
+                       default=unicode(cfg.get(k, d)),
+                       style=prompt_style)
+        cfg[k] = v
+
 
 
     # ensure directory exists

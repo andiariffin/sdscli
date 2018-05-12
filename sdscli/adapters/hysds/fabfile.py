@@ -609,6 +609,8 @@ def add_ci_job(repo, proto, uid=1001, gid=1001, branch=None, release=False):
         elif proto in ('dav', 'davs'):
             ctx['STORAGE_URL'] = "%s://%s:%s@%s/repository/products/containers/" % \
                                  (proto, ctx['DAV_USER'], ctx['DAV_PASSWORD'], ctx['DAV_SERVER'])
+        elif proto in ('azure'):
+            ctx['STORAGE_URL'] = "%s://%s/%s/" % (proto, ctx['AZURE_ENDPOINT'], ctx['CODE_CONTAINER'])
         else:
             raise RuntimeError("Unrecognized storage type for containers: %s" % proto)
         upload_template(config_tmpl, "tmp-jenkins-upload", use_jinja=True, context=ctx,
@@ -765,8 +767,14 @@ def ship_code(cwd, tar_file, encrypt=False):
         run('tar --exclude-vcs -cvjf %s *' % tar_file)
     if encrypt is False:
         run('aws s3 cp %s s3://%s/' % (tar_file, ctx['CODE_BUCKET']))
+        # Azure Cli support to Azure Blob Storage
+        # Azure Blob storage is encrypted with SSE by default - additional settings can be configured with own key on Azure Key Vault
+        run('az storage blob upload -f %s -c %s -n %s --connection-string %s' % (tar_file, ctx['CODE_CONTAINER'], ctx['CODE_BLOB'], ctx['AZ_STORAGE_ACCOUNT']))
     else:
         run('aws s3 cp --sse %s s3://%s/' % (tar_file, ctx['CODE_BUCKET']))
+        # Azure Cli support to Azure Blob Storage
+        # Azure Blob storage is encrypted with SSE by default - additional settings can be configured with own key on Azure Key Vault
+        run('az storage blob upload -f %s -c %s -n %s --connection-string %s' % (tar_file, ctx['CODE_CONTAINER'], ctx['CODE_BLOB'], ctx['AZ_STORAGE_ACCOUNT']))
 
 
 ##########################

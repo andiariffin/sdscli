@@ -245,7 +245,7 @@ def main():
     parser_ci_subparsers = parser_ci.add_subparsers(dest='subparser', help='Continuous integration functions')
     parser_ci_add_job = parser_ci_subparsers.add_parser('add_job', help="add Jenkins job")
     parser_ci_add_job.add_argument('repo', help='git repository url')
-    parser_ci_add_job.add_argument('storage', choices=['s3', 's3s', 'gs', 'dav', 'davs'],
+    parser_ci_add_job.add_argument('storage', choices=['s3', 's3s', 'azure', 'gs', 'dav', 'davs'],
                                    help='image storage type')
     parser_ci_add_job.add_argument('uid', help="image's ops UID")
     parser_ci_add_job.add_argument('gid', help="image's ops GID")
