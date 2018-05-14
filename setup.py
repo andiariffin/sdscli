@@ -11,7 +11,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[ 'distribute', 'pyyaml', 'pygments', 'prompt-toolkit', 
-                       'fabric', 'tqdm==4.19.7', 'backoff' ],
+                       'fabric', 'tqdm==4.19.7', 'backoff', 'azure-mgmt-compute' ],
     entry_points={
         'console_scripts': [
             'sds=sdscli.command_line:main'

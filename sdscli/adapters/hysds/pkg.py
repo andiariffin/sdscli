@@ -219,8 +219,9 @@ def import_pkg(args):
     logger.debug("manifest: {}".format(json.dumps(manifest, indent=2, sort_keys=True)))
 
     # get code bucket
-    code_bucket = conf.get('CODE_BUCKET')
-    code_bucket_url = "s3://{}/{}".format(conf.get('S3_ENDPOINT'), code_bucket)
+    code_bucket = conf.get('CODE_CONTAINER')
+    code_bucket_url = "azure://{}/{}".format(conf.get('AZURE_ENDPOINT'), code_bucket)
+    az_cred = {"account_name": conf.get('AZURE_STORAGE_ACCOUNT_NAME'), "account_key": conf.get('AZURE_STORAGE_ACCOUNT_KEY')}
     logger.debug("code_bucket: {}".format(code_bucket))
     logger.debug("code_bucket_url: {}".format(code_bucket_url))
 
@@ -233,7 +234,7 @@ def import_pkg(args):
     cont_info = manifest['containers']
     cont_image = os.path.join(export_dir, cont_info['url'])
     cont_info['url'] = "{}/{}".format(code_bucket_url, cont_info['url'])
-    put(cont_image, cont_info['url'])
+    put(cont_image, cont_info['url'], az_cred)
     r = requests.put("{}/containers/container/{}".format(mozart_es_url, cont_info['id']),
                      data=json.dumps(cont_info))
     r.raise_for_status()
